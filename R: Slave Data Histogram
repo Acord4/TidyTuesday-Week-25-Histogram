@@ -1,0 +1,97 @@
+---
+title: "Week 25 Slave Data: Histogram"
+author: "Alonso Cordova"
+date: "6/16/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## R Markdown
+
+Call libraries
+```{r libraries}
+library(tidyverse)
+library(ggplot2)
+library(skimr)
+library(RColorBrewer)
+library(cowplot)
+
+```
+
+
+
+
+
+# Call in data
+Note: data gathered from html link
+```{r}
+
+slave_names <- read_csv("slave_names.csv")
+
+```
+
+
+
+
+
+# Make Histo Age df and Height df
+# Second level ordering is unnecesary if you did it before the data wrangling
+```{r}
+
+histo_age <- slave_names %>%  select(gender,age) %>% na.omit(gender)
+
+histo_age$gender <- factor(histo_age$gender, levels = c("Man","Woman","Boy", "Girl"), ordered = TRUE)
+
+histo_height <- slave_names %>%  select(gender,height) %>% na.omit(gender)
+
+histo_height$gender <- factor(histo_height$gender, levels = c("Man","Woman","Boy", "Girl"), ordered = TRUE)
+```
+
+
+
+Testing plot 
+```{r, echo=FALSE}
+# Overlaying density plots
+p1 <- ggplot(histo_age, aes(x = age, fill = gender)) +
+  geom_density(alpha = .25) + scale_fill_brewer(palette = "Dark2") +
+  scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80)) +
+  labs(title = "Age Distribution",
+       y = "Density",
+       x = "Age (Years)",
+       fill = "Gender") +
+  theme_minimal()
+
+p2 <- ggplot(histo_height, aes(x = height, fill = gender)) +
+  geom_density(alpha = .25) + scale_fill_brewer(palette = "Dark2") +
+  scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80)) +
+    labs(title = "Height Distribution",
+       y = "Density",
+       x = "Height (Inches)",
+       fill = "Gender")  +
+  theme_minimal()
+
+p1
+```
+
+
+
+
+Cowplotting Age and Heigth histograms 
+```{r, echo=FALSE}
+# Overlaying density plots
+plots <- plot_grid(p1,p2,ncol = 1, align = "hv",rel_widths = c(1,1) )
+#plots<- plot_grid(plots,bubble_plot,ncol = 1)
+title1 <- ggdraw() + draw_label('Slaves Freed Upon Arrival: 1808-1862, n = 91,490')
+
+plots <- plot_grid(title1,plots,ncol = 1, rel_heights = c(.05,.95))
+plots
+
+```
+
+
+
+
+
+
